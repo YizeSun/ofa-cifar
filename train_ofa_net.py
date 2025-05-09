@@ -42,7 +42,7 @@ if args.task == 'kernel':
     args.base_lr = 3e-2
     args.warmup_epochs = 5
     args.warmup_lr = -1
-    args.ks_list = '3,5'  # 原3 5 7
+    args.ks_list = '3,5,7'  # 原3 5 7
     args.expand_list = '6'
     args.depth_list = '4'
 elif args.task == 'depth':
