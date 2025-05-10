@@ -130,7 +130,7 @@ if __name__ == '__main__':
     if args.kd_ratio > 0:
         args.teacher_path = args.teacher_path = "/home/pdluser/project/once-for-all/exp/teachernet/checkpoint/model_best.pth.tar"
 
-    num_gpus = 1
+    num_gpus = 8
 
     torch.manual_seed(args.manual_seed)
     torch.cuda.manual_seed_all(args.manual_seed)

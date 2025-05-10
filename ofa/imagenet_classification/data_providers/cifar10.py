@@ -228,7 +228,8 @@ def sharpness(img, magnitude):
     return img
 
 class CifarDataProvider(DataProvider):
-	DEFAULT_PATH = '/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/cifar10'
+	# DEFAULT_PATH = '/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/cifar10'
+	DEFAULT_PATH = '/Users/yize_sun/codes/ofa-cifar/datasets/cifar10'
 
 	def __init__(self, save_path=None, train_batch_size=64, test_batch_size=128, valid_size=None, n_worker=4,
 	             resize_scale=0.08, distort_color=None, image_size=32,
@@ -328,7 +329,8 @@ class CifarDataProvider(DataProvider):
 		if self._save_path is None:
 			self._save_path = self.DEFAULT_PATH
 			if not os.path.exists(self._save_path):
-				self._save_path = os.path.expanduser('/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/cifar10')
+				#self._save_path = os.path.expanduser('/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/cifar10')
+				self._save_path = os.path.expanduser('/Users/yize_sun/codes/ofa-cifar/datasets/cifar10')
 		return self._save_path
 
 	@property
