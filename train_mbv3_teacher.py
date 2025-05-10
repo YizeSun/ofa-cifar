@@ -10,14 +10,17 @@ from tqdm import tqdm
 from ofa.imagenet_classification.networks import MobileNetV3Large
 
 # === Device Compatibility ===
-if torch.backends.mps.is_available():  # Just in case on Mac
-    device = torch.device("mps")
-elif hasattr(torch.version, "hip") and torch.version.hip:
-    device = torch.device("cuda")  # AMD ROCm-compatible
+if hasattr(torch.version, "hip") and torch.version.hip is not None:
+    device = torch.device("cuda")  # ROCm/AMD
 elif torch.cuda.is_available():
     device = torch.device("cuda")  # NVIDIA
 else:
     device = torch.device("cpu")
+
+print(f"🔍 Using device: {device}")
+print("PyTorch version:", torch.__version__)
+print("ROCm version:", torch.version.hip)
+print("CUDA available:", torch.cuda.is_available())
 
 print(f"🔍 Using device: {device}")
 
