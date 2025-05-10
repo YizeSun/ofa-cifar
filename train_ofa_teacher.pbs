@@ -1,29 +1,35 @@
+
+
 #!/bin/bash
 #PBS -N train_mbv3_cifar_teacher
-#PBS -l select=1:node_type=rome-ai:ncpus=40
+#PBS -l select=1:node_type=mi300a:ncpus=4
 #PBS -l walltime=24:00:00
 #PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.log
-#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.log
+#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.err
 
 # Change to the direcotry that the job was submitted from
 # conda activate /zhome/academic/HLRS/xmu/xmuyzsun/env/diffusionnag/ 
 cd $WK0/ofa-cifar/
 echo $WK0
 echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.log
-echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.log
-module load rocm/6.1.0
-module load python
-python3 --version
-source /zhome/academic/HLRS/xmu/xmuyzsun/env/ofa-cifar/bin/activate
-lscpu
-env_path="$HOME/env/diffusionnag/bin/activate"
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.err
+module use /opt/hlrs/testing/ai-frameworks/modulefiles
+module load pytorch
+source ~/.venv/ofa-cifar-hunter/bin/activate
+# module load rocm/6.1.0
+# module load python
+# python3 --version
+# source /zhome/academic/HLRS/xmu/xmuyzsun/env/ofa-cifar/bin/activate
+# nvidia-smi
+# lscpu
+# env_path="$HOME/env/diffusionnag/bin/activate"
 # env_path="$HOME/env/graphdit_env/bin/activate"
-source $env_path
+# source $env_path
 # conda activate $HOME/env/diffusionnag
 
 ###########################################################
 start_time=$(date +%s)
-python train_mbv3_teacher.py
+python3 train_mbv3_teacher.py
 end_time=$(date +%s)
 ###########################################################
 
