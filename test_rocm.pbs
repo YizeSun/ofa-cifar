@@ -7,14 +7,17 @@
 
 # Change to the direcotry that the job was submitted from
 # conda activate /zhome/academic/HLRS/xmu/xmuyzsun/env/diffusionnag/ 
-cd $WK0
+cd $WK0/ofa-cifar/
 echo $WK0
 echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/test_rocm.log
 echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/test_rocm.err
-module load rocm/6.1.0
-module load python
-python3 --version
-source /zhome/academic/HLRS/xmu/xmuyzsun/env/ofa-cifar/bin/activate
+module use /opt/hlrs/testing/ai-frameworks/modulefiles
+module load pytorch
+source ~/.venv/ofa-cifar-hunter/bin/activate
+# module load rocm/6.1.0
+# module load python
+# python3 --version
+# source /zhome/academic/HLRS/xmu/xmuyzsun/env/ofa-cifar/bin/activate
 # nvidia-smi
 # lscpu
 # env_path="$HOME/env/diffusionnag/bin/activate"
