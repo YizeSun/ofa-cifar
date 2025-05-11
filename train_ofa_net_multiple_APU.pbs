@@ -12,6 +12,8 @@ cd $WK0/ofa-cifar/
 echo $WK0
 
 source ~/.venv/ofa-cifar-hunter/bin/activate
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_multi_apu.log
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_multi_apu.err
 
 export DEEPSPEED_HOSTFILE=deepspeed.hostfile
 WORLD_SIZE=`cat $PBS_NODEFILE | wc -l`
