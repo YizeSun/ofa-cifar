@@ -344,7 +344,7 @@ class CifarDataProvider(DataProvider):
 	# 	return datasets.CIFAR10(self.valid_path, train=False, transform=_transforms,download=False)
 	def train_dataset(self, _transforms):
 		return datasets.CIFAR10(
-			root=os.path.join(self.save_path, 'cifar-10-batches-py'),
+			root=self.save_path,
 			train=True,
 			transform=_transforms,
 			download=False
@@ -352,7 +352,7 @@ class CifarDataProvider(DataProvider):
 
 	def test_dataset(self, _transforms):
 		return datasets.CIFAR10(
-			root=os.path.join(self.save_path, 'cifar-10-batches-py'),
+			root=self.save_path,
 			train=False,
 			transform=_transforms,
 			download=False
