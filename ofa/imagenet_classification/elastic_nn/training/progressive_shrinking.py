@@ -340,8 +340,10 @@ def train_max(run_manager, args, validate_func=None):
 
 def load_models(run_manager, dynamic_net, model_path=None):
     # specify init path
-    init = torch.load(model_path, map_location='cpu')['state_dict']
-    dynamic_net.load_state_dict(init)
+    # init = torch.load(model_path, map_location='cpu')['state_dict']
+    # dynamic_net.load_state_dict(init)
+    state_dict = torch.load(model_path, map_location='cpu')
+    dynamic_net.load_state_dict(state_dict)
     run_manager.write_log('Loaded init from %s' % model_path, 'valid')
 
 
