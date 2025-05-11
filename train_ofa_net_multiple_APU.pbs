@@ -56,4 +56,4 @@ mpirun -np $WORLD_SIZE \
        -genv LOCAL_SIZE=4 \
        python -u /opt/hlrs/testing/ai-frameworks/DeepSpeed/deepspeed/launcher/launcher_helper.py \
        --launcher mpich \
-       python train_ofa_net.py
+       train_ofa_net.py
