@@ -37,17 +37,25 @@ n_classes = 10
 cifar_data_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/"
 
 # === CIFAR-10 Data ===
+mean = (0.4914, 0.4822, 0.4465)
+std = (0.2023, 0.1994, 0.2010)
+size, pad = 32, 4
 transform_train = transforms.Compose([
-    transforms.Resize(224),
+    transforms.Resize(size,padding=pad),
     transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))
+    transforms.Normalize(mean, std)
 ])
-transform_test = transforms.Compose([
-    transforms.Resize(224),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))
-])
+# transform_test = transforms.Compose([
+#     transforms.Resize(224),
+#     transforms.ToTensor(),
+#     transforms.Normalize((0.5,), (0.5,))
+# ])
+test_transform = transforms.Compose([
+        transforms.Resize(size),
+        transforms.ToTensor(),
+        transforms.Normalize(mean,std),
+    ])
 
 trainset = torchvision.datasets.CIFAR10(root=cifar_data_path, train=True, download=False, transform=transform_train)
 trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=8)
