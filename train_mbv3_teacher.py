@@ -39,9 +39,9 @@ cifar_data_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/"
 # === CIFAR-10 Data ===
 mean = (0.4914, 0.4822, 0.4465)
 std = (0.2023, 0.1994, 0.2010)
-size, pad = 32, 4
+size = 32
 transform_train = transforms.Compose([
-    transforms.Resize(size,padding=pad),
+    transforms.Resize(size),
     transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     transforms.Normalize(mean, std)
@@ -51,7 +51,7 @@ transform_train = transforms.Compose([
 #     transforms.ToTensor(),
 #     transforms.Normalize((0.5,), (0.5,))
 # ])
-test_transform = transforms.Compose([
+transform_test = transforms.Compose([
         transforms.Resize(size),
         transforms.ToTensor(),
         transforms.Normalize(mean,std),
@@ -99,7 +99,7 @@ for epoch in range(num_epochs):
     print(f"✅ Epoch {epoch+1}: avg loss = {total_loss / len(trainloader):.4f}")
 
 # === Save Teacher Model ===
-torch.save(model.state_dict(), f"{cifar_data_path}/ofa_teacher_mbv3_cifar10.pth")
+torch.save({"state_dict": model.state_dict()}, f"{cifar_data_path}/ofa_teacher_mbv3_cifar10.pth")
 print("📦 Saved teacher model as: ofa_teacher_mbv3_cifar10.pth")
 
 # === Evaluation ===
