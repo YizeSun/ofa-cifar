@@ -76,9 +76,9 @@ elif args.task == 'expand':
         args.base_lr = 2.5e-3
         args.warmup_epochs = 0
         args.warmup_lr = -1
-        args.ks_list = '3,5'
-        args.expand_list = '2,4'
-        args.depth_list = '2,3'
+        args.ks_list = '3,5,7'
+        args.expand_list = '4,6'
+        args.depth_list = '2,3,4'
     else:
         args.n_epochs = 120
         args.base_lr = 7.5e-3
@@ -200,17 +200,17 @@ if __name__ == '__main__':
     net = net.cuda()
     # teacher model
     if args.kd_ratio > 0:
-        args.teacher_model = MobileNetV3Large(
-                                n_classes=10,
-                                bn_param=(0.1, 1e-3),
-                                dropout_rate=0,
-                                width_mult=1.0,
-                                ks=7,
-                                expand_ratio=6,
-                                depth_param=4
-                            )
-
-        args.teacher_model.cuda()
+        # args.teacher_model = MobileNetV3Large(
+        #                         n_classes=10,
+        #                         bn_param=(0.1, 1e-3),
+        #                         dropout_rate=0,
+        #                         width_mult=1.0,
+        #                         ks=7,
+        #                         expand_ratio=6,
+        #                         depth_param=4
+        #                     )
+        # args.teacher_model.cuda()
+        args.teacher_model = None
 
     """ RunManager """
     run_manager = RunManager(args.path, net, run_config)
