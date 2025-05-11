@@ -127,19 +127,27 @@ args.independent_distributed_sampling = False
 args.kd_ratio = 1.0
 args.kd_type = 'ce'
 
+import torch.distributed as dist
+
 
 if __name__ == '__main__':
     os.makedirs(args.path, exist_ok=True)
+    deepspeed.init_distributed(dist_backend='nccl')
+    local_rank = int(os.environ["LOCAL_RANK"])
+    rank = int(os.environ["RANK"])
+    world_size = int(os.environ["WORLD_SIZE"])
+    torch.cuda.set_device(local_rank)
+    if rank == 0:
+        print(f'{ rank = }; {local_rank = }; { world_size = }')
 
     if args.kd_ratio > 0:
         args.teacher_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_mbv3_cifar10.pth"
-
-    num_gpus = 1
 
     torch.manual_seed(args.manual_seed)
     torch.cuda.manual_seed_all(args.manual_seed)
     np.random.seed(args.manual_seed)
     random.seed(args.manual_seed)
+
 
     # image size
     args.image_size = [int(img_size)
@@ -163,14 +171,14 @@ if __name__ == '__main__':
     args.train_batch_size = args.base_batch_size
     args.test_batch_size = args.base_batch_size * 4
 
-    run_config = CifarRunConfig(
-        **args.__dict__, num_replicas=num_gpus, rank=0)
+    run_config = DistributedCifarRunConfig(**args.__dict__, num_replicas=world_size, rank=rank)
 
     # print run config information
 
-    print('Run config:')
-    for k, v in run_config.config.items():
-        print('\t%s: %s' % (k, v))
+    if rank == 0:
+        print('Run config:')
+        for k, v in run_config.config.items():
+            print('\t%s: %s' % (k, v))
 
     if args.dy_conv_scaling_mode == -1:
         args.dy_conv_scaling_mode = None
@@ -198,6 +206,8 @@ if __name__ == '__main__':
         dropout_rate=args.dropout, ks_list=args.ks_list, expand_ratio_list=args.expand_list, depth_list=args.expand_list
     )
     net = net.cuda()
+    net = torch.nn.parallel.DistributedDataParallel(net, device_ids=[local_rank])
+
     # teacher model
     if args.kd_ratio > 0:
         args.teacher_model = MobileNetV3Large(
@@ -205,11 +215,16 @@ if __name__ == '__main__':
                 args.bn_momentum, args.bn_eps),
             dropout_rate=0, width_mult=1.0, ks=7, expand_ratio=6, depth_param=4,
         )
-        args.teacher_model.cuda()
+        args.teacher_model = args.teacher_model.cuda()
+        args.teacher_model = torch.nn.parallel.DistributedDataParallel(args.teacher_model, device_ids=[local_rank])
+
 
     """ RunManager """
-    run_manager = RunManager(args.path, net, run_config)
-    run_manager.save_config()
+    # run_manager = RunManager(args.path, net, run_config)
+    run_manager = DistributedRunManager(args.path, net, run_config)
+    if rank == 0:
+        print('Save config:')
+        run_manager.save_config()
 
     # load teacher net weights
     if args.kd_ratio > 0:
@@ -233,8 +248,10 @@ if __name__ == '__main__':
                 model_dir='.torch/ofa_checkpoints/%d' % 0
             )
             # load_models(run_manager, run_manager.net, args.ofa_checkpoint_path)
-            run_manager.write_log(
-                '%.3f\t%.3f\t%.3f\t%s' % validate(run_manager, is_test=True, **validate_func_dict), 'valid')
+            if rank == 0:
+                print('Run config:')
+                run_manager.write_log(
+                    '%.3f\t%.3f\t%.3f\t%s' % validate(run_manager, is_test=True, **validate_func_dict), 'valid')
         else:
             assert args.resume
 
@@ -264,3 +281,6 @@ if __name__ == '__main__':
         train_elastic_expand(train, run_manager, args, validate_func_dict)
     else:
         raise NotImplementedError
+    if torch.distributed.is_initialized():
+        torch.distributed.destroy_process_group()
+
