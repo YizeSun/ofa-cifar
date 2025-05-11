@@ -133,6 +133,7 @@ if __name__ == '__main__':
     local_rank = int(os.environ["LOCAL_RANK"])
     rank = int(os.environ["RANK"])
     world_size = int(os.environ["WORLD_SIZE"])
+    torch.cuda.set_device(local_rank)
     if rank == 0:
         print(f'{ rank = }; {local_rank = }; { world_size = }')
 
@@ -143,6 +144,7 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(args.manual_seed)
     np.random.seed(args.manual_seed)
     random.seed(args.manual_seed)
+
 
     # image size
     args.image_size = [int(img_size)

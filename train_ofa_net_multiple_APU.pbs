@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N Train_cifar_multi_apu
-#PBS -l select=4:node_type=mi300a:mpiprocs=4:ncpus=160
+#PBS -l select=2:node_type=mi300a:mpiprocs=4:ncpus=80
 #PBS -l walltime=24:00:00
 #PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_multi_apu.log
 #PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_multi_apu.err
@@ -49,7 +49,7 @@ fi
 mpirun -np $WORLD_SIZE \
        --ppn 4 \
        --genvall \
-       --cpu-bind list:0-39:40-79:80-119:120-159 \
+       --cpu-bind list:0-19:20-39:40-59:60-79 \
        --gpu-bind none \
        --no-transfer \
        -genv WORLD_SIZE=$WORLD_SIZE \
