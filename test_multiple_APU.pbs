@@ -1,0 +1,56 @@
+#!/bin/bash
+#PBS -N PyTorch_MultiNode
+#PBS -l select=2:node_type=mi300a:mpiprocs=4:ncpus=92
+#PBS -l walltime=00:10:00
+#PBS -q test
+
+module use /opt/hlrs/testing/ai-frameworks/modulefiles
+module load pytorch
+
+cd $WK0/ofa-cifar/
+echo $WK0
+
+source ~/.venv/ofa-cifar-hunter/bin/activate
+
+export DEEPSPEED_HOSTFILE=deepspeed.hostfile
+WORLD_SIZE=`cat $PBS_NODEFILE | wc -l`
+echo "World size: $WORLD_SIZE"
+
+sort $PBS_NODEFILE | awk -F'.' '{print $1}' | uniq | while read node; do
+    echo "$node slots=4"
+done > "$DEEPSPEED_HOSTFILE"
+export HEAD_NODE_IP=$(head -n 1 $PBS_NODEFILE | awk -F'.' '{print $1}')
+echo "Head node: $HEAD_NODE_IP"
+export MASTER_PORT=29500
+export MASTER_ADDR=$HEAD_NODE_IP
+
+# Generate DeepSpeed hostfile from PBS_NODEFILE
+if [ -f $PBS_NODEFILE ]; then
+  # Clear any existing hostfile
+  > $DEEPSPEED_HOSTFILE
+  # Get unique nodes, remove domain suffix, and set fixed number of slots
+  sort $PBS_NODEFILE | uniq | while read host; do
+    # Extract the node name without domain suffix
+    short_name=$(echo $host | cut -d '.' -f 1)
+    # Set fixed number of slots (4 in this case)
+    echo "$short_name slots=4" >> $DEEPSPEED_HOSTFILE
+  done
+
+  echo "Generated DeepSpeed hostfile with $(wc -l < $DEEPSPEED_HOSTFILE) nodes:"
+  cat $DEEPSPEED_HOSTFILE
+else
+  echo "Error: PBS_NODEFILE not found!"
+  exit 1
+fi
+
+mpirun -np $WORLD_SIZE \
+       --ppn 4 \
+       --genvall \
+       --cpu-bind list:0-23:24-47:48-71:72-95 \
+       --gpu-bind none \
+       --no-transfer \
+       -genv WORLD_SIZE=$WORLD_SIZE \
+       -genv LOCAL_SIZE=4 \
+       python -u /opt/hlrs/testing/ai-frameworks/DeepSpeed/deepspeed/launcher/launcher_helper.py \
+       --launcher mpich \
+       multinode.py 10 10
