@@ -337,11 +337,26 @@ class CifarDataProvider(DataProvider):
 	def data_url(self):
 		raise ValueError('unable to download %s' % self.name())
 
+	# def train_dataset(self, _transforms):
+	# 	return datasets.CIFAR10(self.train_path, train=True, transform=_transforms,download=False)
+
+	# def test_dataset(self, _transforms):
+	# 	return datasets.CIFAR10(self.valid_path, train=False, transform=_transforms,download=False)
 	def train_dataset(self, _transforms):
-		return datasets.CIFAR10(self.train_path, train=True, transform=_transforms,download=False)
+		return datasets.CIFAR10(
+			root=os.path.join(self.save_path, 'cifar-10-batches-py'),
+			train=True,
+			transform=_transforms,
+			download=False
+		)
 
 	def test_dataset(self, _transforms):
-		return datasets.CIFAR10(self.valid_path, train=False, transform=_transforms,download=False)
+		return datasets.CIFAR10(
+			root=os.path.join(self.save_path, 'cifar-10-batches-py'),
+			train=False,
+			transform=_transforms,
+			download=False
+		)
 
 	@property
 	def train_path(self):
