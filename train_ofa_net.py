@@ -275,5 +275,6 @@ if __name__ == '__main__':
         train_elastic_expand(train, run_manager, args, validate_func_dict)
     else:
         raise NotImplementedError
-    dist.destroy_process_group()
+    if torch.distributed.is_initialized():
+        torch.distributed.destroy_process_group()
 
