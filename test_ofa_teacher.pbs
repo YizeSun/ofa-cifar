@@ -29,7 +29,7 @@ source ~/.venv/ofa-cifar-hunter/bin/activate
 
 ###########################################################
 start_time=$(date +%s)
-python train_mbv3_teacher.py
+python test_ofa_teacher.py
 end_time=$(date +%s)
 ###########################################################
 
