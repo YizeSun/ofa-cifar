@@ -36,15 +36,15 @@ def main():
     batch_size = 128
     learning_rate = 0.05
     width_mult = 1.0
-    ks = [3,5,7]
-    expand_ratio = [3,4,6]
-    depth_param = [2,3,4]
+    ks = 7 # [3,5,7]
+    expand_ratio = 6 # [3,4,6]
+    depth_param = 4 # [2,3,4]
     n_classes = 10
 
     cifar_data_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets"
     mean = (0.4914, 0.4822, 0.4465)
     std = (0.2023, 0.1994, 0.2010)
-    size = 32
+    size = 32 # 224
 
     transform_train = transforms.Compose([
         transforms.Resize(size),
@@ -110,7 +110,7 @@ def main():
 
     # === Save Model (only by rank 0) ===
     if rank == 0:
-        torch.save({"state_dict": model.module.state_dict()}, f"{cifar_data_path}/ofa_teacher_12051745_cifar10.pth")
+        torch.save({"state_dict": model.module.state_dict()}, f"{cifar_data_path}/ofa_teacher_12051745_{size}_cifar10.pth")
         print("📦 Saved teacher model")
 
         # === Evaluation
