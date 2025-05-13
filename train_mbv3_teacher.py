@@ -44,7 +44,7 @@ def main():
     cifar_data_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets"
     mean = (0.4914, 0.4822, 0.4465)
     std = (0.2023, 0.1994, 0.2010)
-    size = 32 # 224
+    size = 224 # 32
 
     transform_train = transforms.Compose([
         transforms.Resize(size),
