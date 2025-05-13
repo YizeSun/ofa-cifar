@@ -133,7 +133,7 @@ if __name__ == '__main__':
     os.makedirs(args.path, exist_ok=True)
 
     if args.kd_ratio > 0:
-        args.teacher_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_cifar10.pth"
+        args.teacher_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_32_cifar10.pth"
 
     num_gpus = 1
 
@@ -208,7 +208,7 @@ if __name__ == '__main__':
         )
         args.teacher_model = MobileNetV3Large(
                                 n_classes=10,
-                                bn_param=(0.1, 1e-3),
+                                bn_param=(0.1, 1e-5),
                                 dropout_rate=0,
                                 width_mult=1.0,
                                 ks=7,
