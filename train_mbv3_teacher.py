@@ -110,7 +110,7 @@ def main():
 
     # === Save Model (only by rank 0) ===
     if rank == 0:
-        torch.save({"state_dict": model.module.state_dict()}, f"{cifar_data_path}/ofa_teacher_ofa_357_cifar10.pth")
+        torch.save({"state_dict": model.module.state_dict()}, f"{cifar_data_path}/ofa_teacher_12051745_cifar10.pth")
         print("📦 Saved teacher model")
 
         # === Evaluation

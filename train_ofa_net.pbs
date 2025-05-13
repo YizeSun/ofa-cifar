@@ -8,7 +8,8 @@
 #PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_net.err
 
 # Change to the direcotry that the job was submitted from
-# conda activate /zhome/academic/HLRS/xmu/xmuyzsun/env/diffusionnag/ 
+# conda activate /zhome/academic/HLRS/xmu/xmuyzsun/env/diffusionnag/
+export CUDA_VISIBLE_DEVICES=0
 cd $WK0/ofa-cifar/
 echo $WK0
 echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_net.log

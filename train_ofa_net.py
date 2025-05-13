@@ -133,7 +133,7 @@ if __name__ == '__main__':
     os.makedirs(args.path, exist_ok=True)
 
     if args.kd_ratio > 0:
-        args.teacher_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_mbv3_cifar10.pth"
+        args.teacher_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_cifar10.pth"
 
     num_gpus = 1
 
@@ -201,17 +201,22 @@ if __name__ == '__main__':
     net = net.cuda()
     # teacher model
     if args.kd_ratio > 0:
-        # args.teacher_model = MobileNetV3Large(
-        #                         n_classes=10,
-        #                         bn_param=(0.1, 1e-3),
-        #                         dropout_rate=0,
-        #                         width_mult=1.0,
-        #                         ks=7,
-        #                         expand_ratio=6,
-        #                         depth_param=4
-        #                     )
-        # args.teacher_model.cuda()
-        args.teacher_model = None
+        MobileNetV3Large(
+            n_classes=run_config.data_provider.n_classes, bn_param=(
+                args.bn_momentum, args.bn_eps),
+            dropout_rate=0, width_mult=1.0, ks=7, expand_ratio=6, depth_param=4,
+        )
+        args.teacher_model = MobileNetV3Large(
+                                n_classes=10,
+                                bn_param=(0.1, 1e-3),
+                                dropout_rate=0,
+                                width_mult=1.0,
+                                ks=7,
+                                expand_ratio=6,
+                                depth_param=4
+                            )
+        args.teacher_model.cuda()
+        # args.teacher_model = None
 
     """ RunManager """
     run_manager = RunManager(args.path, net, run_config)
@@ -264,9 +269,9 @@ if __name__ == '__main__':
         from ofa.imagenet_classification.elastic_nn.training.progressive_shrinking import \
             train_elastic_expand
         if args.phase == 1:
-            args.ofa_checkpoint_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_mbv3_cifar10.pth"
+            args.ofa_checkpoint_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_cifar10.pth"
         else:
-            args.ofa_checkpoint_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_mbv3_cifar10.pth"
+            args.ofa_checkpoint_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_cifar10.pth"
         train_elastic_expand(train, run_manager, args, validate_func_dict)
     else:
         raise NotImplementedError
