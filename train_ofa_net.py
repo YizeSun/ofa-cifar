@@ -112,6 +112,7 @@ args.n_worker = 3
 args.resize_scale = 0.08
 args.distort_color = 'tf'
 # args.image_size = '24,32'
+img_size = 32
 args.image_size = '32'
 args.continuous_size = True
 args.not_sync_distributed_image_size = False
@@ -131,7 +132,6 @@ args.kd_type = 'ce'
 
 if __name__ == '__main__':
     os.makedirs(args.path, exist_ok=True)
-    img_size = args.image_size
     if args.kd_ratio > 0:
         args.teacher_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_{img_size}_cifar10.pth"
 
@@ -231,7 +231,7 @@ if __name__ == '__main__':
     from ofa.imagenet_classification.elastic_nn.training.progressive_shrinking import (
         train, validate)
 
-    validate_func_dict = {'image_size_list': {32} if isinstance(args.image_size, int) else sorted({24, 32}),
+    validate_func_dict = {'image_size_list': {img_size} if isinstance(args.image_size, int) else sorted({img_size, img_size}),
                           'ks_list': sorted({min(args.ks_list), max(args.ks_list)}),
                           'expand_ratio_list': sorted({min(args.expand_list), max(args.expand_list)}),
                           'depth_list': sorted({min(net.depth_list), max(net.depth_list)})}

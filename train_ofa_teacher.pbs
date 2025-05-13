@@ -2,15 +2,15 @@
 #PBS -N train_mbv3_cifar_teacher
 #PBS -l select=2:node_type=mi300a:mpiprocs=4:ncpus=92
 #PBS -l walltime=24:00:00
-#PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.log
-#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.err
+#PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_32_teacher.log
+#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_32_teacher.err
 
 # Change to the direcotry that the job was submitted from
-# conda activate /zhome/academic/HLRS/xmu/xmuyzsun/env/diffusionnag/ 
+# conda activate /zhome/academic/HLRS/xmu/xmuyzsun/env/diffusionnag/
 cd $WK0/ofa-cifar/
 echo $WK0
-echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.log
-echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_teacher.err
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_32_teacher.log
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_cifar_32_teacher.err
 module use /opt/hlrs/testing/ai-frameworks/modulefiles
 module load pytorch
 source ~/.venv/ofa-cifar-hunter/bin/activate
