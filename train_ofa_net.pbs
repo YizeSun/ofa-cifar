@@ -4,16 +4,16 @@
 #PBS -N train_mbv3_cifar_teacher
 #PBS -l select=1:node_type=mi300a:ncpus=40
 #PBS -l walltime=24:00:00
-#PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_224_net.log
-#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_224_net.err
+#PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_224teacher32_net.log
+#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_224teacher32_net.err
 
 # Change to the direcotry that the job was submitted from
 # conda activate /zhome/academic/HLRS/xmu/xmuyzsun/env/diffusionnag/
 export CUDA_VISIBLE_DEVICES=0
 cd $WK0/ofa-cifar/
 echo $WK0
-echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_224_net.log
-echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_224_net.err
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_224teacher32_net.log
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_ofa_224teacher32_net.err
 module use /opt/hlrs/testing/ai-frameworks/modulefiles
 module load pytorch
 source ~/.venv/ofa-cifar-hunter/bin/activate

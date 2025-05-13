@@ -112,8 +112,8 @@ args.n_worker = 3
 args.resize_scale = 0.08
 args.distort_color = 'tf'
 # args.image_size = '24,32'
-img_size = 224
-args.image_size = '224'
+img_size = 32
+args.image_size = '32'
 args.continuous_size = True
 args.not_sync_distributed_image_size = False
 
@@ -133,7 +133,7 @@ args.kd_type = 'ce'
 if __name__ == '__main__':
     os.makedirs(args.path, exist_ok=True)
     if args.kd_ratio > 0:
-        args.teacher_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_{img_size}_cifar10.pth"
+        args.teacher_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_224_cifar10.pth"
 
     num_gpus = 1
 
