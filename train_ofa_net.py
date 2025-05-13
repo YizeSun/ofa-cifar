@@ -131,9 +131,9 @@ args.kd_type = 'ce'
 
 if __name__ == '__main__':
     os.makedirs(args.path, exist_ok=True)
-
+    img_size = args.image_size
     if args.kd_ratio > 0:
-        args.teacher_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_32_cifar10.pth"
+        args.teacher_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_{img_size}_cifar10.pth"
 
     num_gpus = 1
 
@@ -269,9 +269,9 @@ if __name__ == '__main__':
         from ofa.imagenet_classification.elastic_nn.training.progressive_shrinking import \
             train_elastic_expand
         if args.phase == 1:
-            args.ofa_checkpoint_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_cifar10.pth"
+            args.ofa_checkpoint_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_{img_size}_cifar10.pth"
         else:
-            args.ofa_checkpoint_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_cifar10.pth"
+            args.ofa_checkpoint_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_{img_size}_cifar10.pth"
         train_elastic_expand(train, run_manager, args, validate_func_dict)
     else:
         raise NotImplementedError
