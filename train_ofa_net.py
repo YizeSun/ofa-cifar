@@ -269,9 +269,9 @@ if __name__ == '__main__':
         from ofa.imagenet_classification.elastic_nn.training.progressive_shrinking import \
             train_elastic_expand
         if args.phase == 1:
-            args.ofa_checkpoint_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_{img_size}_cifar10.pth"
+            args.ofa_checkpoint_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_224teacher{img_size}_cifar10.pth"
         else:
-            args.ofa_checkpoint_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_{img_size}_cifar10.pth"
+            args.ofa_checkpoint_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_224teacher{img_size}_cifar10.pth"
         train_elastic_expand(train, run_manager, args, validate_func_dict)
     else:
         raise NotImplementedError
