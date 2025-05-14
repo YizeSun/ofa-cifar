@@ -118,20 +118,7 @@ def main():
 
     # === Model
     super_net = ofa_net("ofa_mbv3_d234_e346_k357_w1.0", pretrained=False)
-    checkpoint = torch.load('/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/test_mbv3/graphs/ofa_mbv3_d234_e346_k357_w1.0')
-
-    state_dict = checkpoint['state_dict']
-
-    # Remove classifier weights from the checkpoint
-    state_dict = {k: v for k, v in state_dict.items()
-                if not k.startswith('classifier.linear')}
-
-    # Load all compatible weights
-    result = super_net.load_state_dict(state_dict, strict=False)
-
-    # Now manually set the CIFAR-10 classifier
-    super_net.classifier.linear = nn.Linear(1280, 10)
-
+    super_net.load_state_dict(torch.load('./graphs/ofa_mbv3_d234_e346_k357_w1.0')['state_dict'])
     # 'ks': [7, 5, 3, 3, 5, 5, 3, 5, 7, 7, 3, 5, 5, 7, 5, 5, 7, 3, 5, 7], 'e': [6, 4, 3, 6, 3, 3, 6, 4, 3, 4, 3, 6, 3, 6, 6, 6, 4, 6, 3, 6], 'd': [3, 2, 4, 3, 3]
     model = super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
                                         , e=my_graph["ks_e_d"]['e']
