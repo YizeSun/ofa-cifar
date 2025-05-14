@@ -37,7 +37,7 @@ fi
 
 GRAPH_DIR="${WK0}ofa-cifar/test_mbv3/graphs"
 SCRIPT="evaluate_mbv3_cifar10.py"
-python test_final_graphs_cifar10.py
+# python test_final_graphs_cifar10.py
 
 # Processing files: $GRAPH_DIR/cifar10_graph_018.json $GRAPH_DIR/cifar10_graph_019.json $GRAPH_DIR/cifar10_graph_020.json
 for graph_file in $GRAPH_DIR/cifar10_graph_018.json $GRAPH_DIR/cifar10_graph_019.json $GRAPH_DIR/cifar10_graph_020.json; do
@@ -56,5 +56,5 @@ for graph_file in $GRAPH_DIR/cifar10_graph_018.json $GRAPH_DIR/cifar10_graph_019
 done
 
 # Final Summary
-echo -e "\n📊 Final Summary:"
-python $SCRIPT --input $GRAPH_DIR/cifar10_graph_018.json $GRAPH_DIR/cifar10_graph_019.json $GRAPH_DIR/cifar10_graph_020.json
+# echo -e "\n📊 Final Summary:"
+# python $SCRIPT --input $GRAPH_DIR/cifar10_graph_018.json $GRAPH_DIR/cifar10_graph_019.json $GRAPH_DIR/cifar10_graph_020.json

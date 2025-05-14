@@ -37,14 +37,14 @@ fi
 
 GRAPH_DIR="${{WK0}}ofa-cifar/test_mbv3/graphs"
 SCRIPT="evaluate_mbv3_cifar10.py"
-python test_final_graphs_cifar10.py
+# python test_final_graphs_cifar10.py
 
 # Processing files: {file_list}
 {loop_block}
 
 # Final Summary
-echo -e "\\n📊 Final Summary:"
-python $SCRIPT --input {input_summary}
+# echo -e "\\n📊 Final Summary:"
+# python $SCRIPT --input {input_summary}
 """
 
 for part_id in range(10):
