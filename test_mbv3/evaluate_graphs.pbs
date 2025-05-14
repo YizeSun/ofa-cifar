@@ -47,7 +47,7 @@ fi
 
 ###########################################################
 # Loop over each file
-GRAPH_DIR="$WK0/ofa-cifar/test_mbv3/graphs/"
+GRAPH_DIR="${WK0}ofa-cifar/test_mbv3/graphs"
 SCRIPT="evaluate_mbv3_cifar10.py"
 
 echo "Run test_final_graphs_cifar10"
