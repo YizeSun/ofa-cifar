@@ -127,7 +127,7 @@ def main():
                 if not k.startswith('classifier.linear')}
 
     # Load all compatible weights
-    missing_keys, unexpected_keys = super_net.load_state_dict(state_dict, strict=False)
+    result = super_net.load_state_dict(state_dict, strict=False)
 
     # Now manually set the CIFAR-10 classifier
     super_net.classifier.linear = nn.Linear(1280, 10)
