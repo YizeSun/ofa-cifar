@@ -63,6 +63,7 @@ def cleanup():
 
 # --- Main pipeline ---
 def main():
+    local_rank = setup()
     parser = argparse.ArgumentParser(description="Evaluate or summarize a graph architecture.")
     parser.add_argument('--input', type=str, nargs='+', required=True, help='Input JSON file(s)')
     parser.add_argument('--summary', action='store_true', help='Summarize evaluation results')
@@ -71,21 +72,11 @@ def main():
     if args.summary:
         summarize_all_evaluations(args.input)
         return
-
-    local_rank = setup()
-    parser = argparse.ArgumentParser(description="Evaluate architecture from JSON file")
-    parser.add_argument('--input', type=str, required=True, help='Path to the input JSON file')
-    args = parser.parse_args()
     input_path = args.input
 
-    # Load graphs
-    with open(input_path, 'r') as f:
-        graphs = json.load(f)
-
     device = torch.device("cuda", local_rank)
-    my_graph = None
 
-    for input_file in args.input:
+    for input_file in input_path:
         with open(input_file, 'r') as f:
             my_graph = json.load(f)
 
