@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N train_mbv3_cifar_teacher
+#PBS -N evaluate_cifar10_30m_32
 #PBS -l select=2:node_type=mi300a:mpiprocs=4:ncpus=96
 #PBS -l walltime=24:00:00
 #PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_30m_cifar10_32.log
