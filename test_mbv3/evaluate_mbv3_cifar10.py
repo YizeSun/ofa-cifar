@@ -139,7 +139,7 @@ def main():
                             worker_init_fn=seed_worker, generator=generator)
 
     super_net = OFAMobileNetV3(n_classes=n_classes, width_mult=width_mult,
-        dropout_rate=0, width_mult=1.0, ks_list=[3, 5, 7], expand_ratio_list=[3, 4, 6], depth_list=[2, 3, 4],
+        dropout_rate=0, ks_list=[3, 5, 7], expand_ratio_list=[3, 4, 6], depth_list=[2, 3, 4],
     )
     super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks'], e=my_graph["ks_e_d"]['e'], d=my_graph["ks_e_d"]['d'])
     model = super_net.get_active_subnet().to(device)
