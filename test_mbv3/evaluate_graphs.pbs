@@ -57,9 +57,9 @@ echo "Run test_final_graphs_cifar10"
 for graph_file in $GRAPH_DIR/cifar10_graph_*.json
 do
     echo "📂 Evaluating $graph_file"
-    for i in 1 2 3
-    do
-        echo "  → Run $i"
+    # for i in 1 2 3
+    # do
+        # echo "  → Run $i"
         mpirun -np $WORLD_SIZE \
                 --ppn 4 \
                 --genvall \
@@ -71,7 +71,7 @@ do
                 python -u /opt/hlrs/testing/ai-frameworks/DeepSpeed/deepspeed/launcher/launcher_helper.py \
                 --launcher mpich \
                 $SCRIPT --input "$graph_file"
-    done
+    # done
 done
 
 # Now summarize across all evaluated files

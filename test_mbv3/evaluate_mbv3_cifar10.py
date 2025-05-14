@@ -118,9 +118,9 @@ def main():
     # === Model
     super_net = ofa_net("ofa_mbv3_d234_e346_k357_w1.0", pretrained=False)
     # 'ks': [7, 5, 3, 3, 5, 5, 3, 5, 7, 7, 3, 5, 5, 7, 5, 5, 7, 3, 5, 7], 'e': [6, 4, 3, 6, 3, 3, 6, 4, 3, 4, 3, 6, 3, 6, 6, 6, 4, 6, 3, 6], 'd': [3, 2, 4, 3, 3]
-    model = super_net.set_active_subnet(ks=[7, 5, 3, 3, 5, 5, 3, 5, 7, 7, 3, 5, 5, 7, 5, 5, 7, 3, 5, 7]
-                        , e=[6, 4, 3, 6, 3, 3, 6, 4, 3, 4, 3, 6, 3, 6, 6, 6, 4, 6, 3, 6]
-                        , d=[3, 2, 4, 3, 3])
+    model = super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
+                        , e=my_graph["ks_e_d"]['e']
+                        , d=my_graph["ks_e_d"]['d'])
     model = model.to(device)
 
 
