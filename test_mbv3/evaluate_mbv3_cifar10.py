@@ -123,7 +123,7 @@ def main():
     model = super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
                                         , e=my_graph["ks_e_d"]['e']
                                         , d=my_graph["ks_e_d"]['d'])
-    
+    model = super_net.get_active_subnet()
     model = model.to(device)
     # model = MobileNetV3Large(
     #     n_classes=n_classes,
