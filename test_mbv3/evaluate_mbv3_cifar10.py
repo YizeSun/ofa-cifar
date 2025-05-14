@@ -14,7 +14,7 @@ import torch.distributed as dist
 from torch.nn import Module
 
 from ofa.imagenet_classification.networks import MobileNetV3Large
-from ofa.model_zoo import ofa_net
+from ofa.model_zoo import ofa_net, OFAMobileNetV3
 import deepspeed
 
 import argparse
@@ -117,10 +117,14 @@ def main():
     testloader = DataLoader(testset, batch_size=100, shuffle=False, num_workers=4)
 
     # === Model
-    super_net = ofa_net("ofa_mbv3_d234_e346_k357_w1.0", pretrained=False)
-    super_net.load_state_dict(torch.load('./graphs/ofa_mbv3_d234_e346_k357_w1.0')['state_dict'])
+    # super_net = ofa_net("ofa_mbv3_d234_e346_k357_w1.0", pretrained=False)
+    # super_net.load_state_dict(torch.load('./graphs/ofa_mbv3_d234_e346_k357_w1.0')['state_dict'])
+
+    super_net = OFAMobileNetV3(
+			dropout_rate=0, width_mult=1.0, ks_list=[3, 5, 7], expand_ratio_list=[3, 4, 6], depth_list=[2, 3, 4],
+		)
     # 'ks': [7, 5, 3, 3, 5, 5, 3, 5, 7, 7, 3, 5, 5, 7, 5, 5, 7, 3, 5, 7], 'e': [6, 4, 3, 6, 3, 3, 6, 4, 3, 4, 3, 6, 3, 6, 6, 6, 4, 6, 3, 6], 'd': [3, 2, 4, 3, 3]
-    model = super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
+    super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
                                         , e=my_graph["ks_e_d"]['e']
                                         , d=my_graph["ks_e_d"]['d'])
     model = super_net.get_active_subnet()
