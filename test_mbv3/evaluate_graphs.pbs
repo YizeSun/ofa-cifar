@@ -51,7 +51,7 @@ GRAPH_DIR="${WK0}ofa-cifar/test_mbv3/graphs"
 SCRIPT="evaluate_mbv3_cifar10.py"
 
 echo "Run test_final_graphs_cifar10"
-# python test_final_graphs_cifar10.py
+python test_final_graphs_cifar10.py
 
 # Loop over each graph file and evaluate it 3 times
 for graph_file in $GRAPH_DIR/cifar10_graph_*.json

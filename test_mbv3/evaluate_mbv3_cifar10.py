@@ -135,7 +135,7 @@ def main():
     # ).to(device)
 
 
-    model = DDP(model, device_ids=[local_rank], output_device=local_rank)
+    model = DDP(model, device_ids=[local_rank], output_device=local_rank, find_unused_parameters=True)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, weight_decay=5e-4)
