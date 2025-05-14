@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
+from torch.nn import Module
 
 from ofa.imagenet_classification.networks import MobileNetV3Large
 from ofa.model_zoo import ofa_net
@@ -117,9 +118,13 @@ def main():
 
     # === Model
     super_net = ofa_net("ofa_mbv3_d234_e346_k357_w1.0", pretrained=False)
-    super_net.load_state_dict(torch.load('/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/test_mbv3/graphs/ofa_mbv3_d234_e346_k357_w1.0')['state_dict'], strict=False)
-    
-    super_net.classifier.linear = nn.Linear(1280, n_classes)
+    state = torch.load('/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/test_mbv3/graphs/ofa_mbv3_d234_e346_k357_w1.0')
+
+    # Load the state dict without loading the classifier
+    Module.load_state_dict(super_net, state['state_dict'], strict=False)
+
+    # Re-initialize classifier for CIFAR-10
+    super_net.classifier.linear = nn.Linear(1280, 10)
 
     # 'ks': [7, 5, 3, 3, 5, 5, 3, 5, 7, 7, 3, 5, 5, 7, 5, 5, 7, 3, 5, 7], 'e': [6, 4, 3, 6, 3, 3, 6, 4, 3, 4, 3, 6, 3, 6, 6, 6, 4, 6, 3, 6], 'd': [3, 2, 4, 3, 3]
     model = super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
