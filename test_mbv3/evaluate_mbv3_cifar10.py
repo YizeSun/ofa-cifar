@@ -2,6 +2,8 @@ import argparse
 import json
 import os
 import copy
+import random
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -17,10 +19,24 @@ from ofa.imagenet_classification.networks import MobileNetV3Large
 from ofa.model_zoo import ofa_net, OFAMobileNetV3
 import deepspeed
 
-import argparse
-import json
-import random
-import numpy as np
+def set_seed(seed: int):
+    rank = dist.get_rank() if dist.is_initialized() else 0
+    seed = seed + rank
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
+    torch.use_deterministic_algorithms(True)
+
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
 
 def summarize_all_evaluations(file_paths):
     all_accuracies = []
@@ -36,7 +52,7 @@ def summarize_all_evaluations(file_paths):
                     all_losses.append(e['loss'])
 
     if not all_accuracies:
-        print("⚠️ No valid evaluations found.")
+        print("\u26a0\ufe0f No valid evaluations found.")
         return
 
     acc_mean = np.mean(all_accuracies)
@@ -44,13 +60,13 @@ def summarize_all_evaluations(file_paths):
     loss_mean = np.mean(all_losses)
     loss_range = (np.max(all_losses) - np.min(all_losses)) / 2
 
-    print("\n📊 Overall Evaluation Summary:")
+    print("\n\ud83d\udcca Overall Evaluation Summary:")
     print(f"  Accuracy = {acc_mean:.4f} ± {acc_range:.4f}")
     print(f"  Loss     = {loss_mean:.4f} ± {loss_range:.4f}")
 
 # === Distributed Init ===
 def setup():
-    deepspeed.init_distributed(dist_backend='nccl')  # assumes NCCL + ROCm for MI300A
+    deepspeed.init_distributed(dist_backend='nccl')
     local_rank = int(os.environ["LOCAL_RANK"])
     rank = int(os.environ["RANK"])
     world_size = int(os.environ["WORLD_SIZE"])
@@ -60,11 +76,13 @@ def setup():
 
 def cleanup():
     if dist.is_initialized():
-        dist.destroy_process_group() 
+        dist.destroy_process_group()
 
-# --- Main pipeline ---
 def main():
+    my_seed = 777
     local_rank = setup()
+    set_seed(my_seed)  # Set base seed after DDP init
+
     parser = argparse.ArgumentParser(description="Evaluate or summarize a graph architecture.")
     parser.add_argument('--input', type=str, nargs='+', required=True, help='Input JSON file(s)')
     parser.add_argument('--summary', action='store_true', help='Summarize evaluation results')
@@ -84,7 +102,6 @@ def main():
         if 'evaluation' not in my_graph or not isinstance(my_graph['evaluation'], list):
             my_graph['evaluation'] = []
 
-    # === Config ===
     num_epochs = 100
     batch_size = 128
     learning_rate = 0.05
@@ -94,7 +111,7 @@ def main():
     cifar_data_path = "/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets"
     mean = (0.4914, 0.4822, 0.4465)
     std = (0.2023, 0.1994, 0.2010)
-    size = 224 # 32
+    size = 224
 
     transform_train = transforms.Compose([
         transforms.Resize(size),
@@ -108,37 +125,24 @@ def main():
         transforms.Normalize(mean, std)
     ])
 
-    # === Dataset and Sampler
     trainset = torchvision.datasets.CIFAR10(root=cifar_data_path, train=True, download=False, transform=transform_train)
     train_sampler = DistributedSampler(trainset)
-    trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=False, sampler=train_sampler, num_workers=4)
+
+    generator = torch.Generator()
+    generator.manual_seed(my_seed)
+
+    trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=False, sampler=train_sampler, num_workers=4,
+                             worker_init_fn=seed_worker, generator=generator)
 
     testset = torchvision.datasets.CIFAR10(root=cifar_data_path, train=False, download=False, transform=transform_test)
-    testloader = DataLoader(testset, batch_size=100, shuffle=False, num_workers=4)
+    testloader = DataLoader(testset, batch_size=100, shuffle=False, num_workers=4,
+                            worker_init_fn=seed_worker, generator=generator)
 
-    # === Model
-    # super_net = ofa_net("ofa_mbv3_d234_e346_k357_w1.0", pretrained=False)
-    # super_net.load_state_dict(torch.load('./graphs/ofa_mbv3_d234_e346_k357_w1.0')['state_dict'])
-
-    super_net = OFAMobileNetV3(
-			dropout_rate=0, width_mult=1.0, ks_list=[3, 5, 7], expand_ratio_list=[3, 4, 6], depth_list=[2, 3, 4],
-		)
-    # 'ks': [7, 5, 3, 3, 5, 5, 3, 5, 7, 7, 3, 5, 5, 7, 5, 5, 7, 3, 5, 7], 'e': [6, 4, 3, 6, 3, 3, 6, 4, 3, 4, 3, 6, 3, 6, 6, 6, 4, 6, 3, 6], 'd': [3, 2, 4, 3, 3]
-    super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
-                                        , e=my_graph["ks_e_d"]['e']
-                                        , d=my_graph["ks_e_d"]['d'])
-    model = super_net.get_active_subnet()
-    model = model.to(device)
-    # model = MobileNetV3Large(
-    #     n_classes=n_classes,
-    #     bn_param=(0.1, 1e-5),
-    #     dropout_rate=0,
-    #     width_mult=width_mult,
-    #     ks=my_graph["ks_e_d"]['ks'],
-    #     expand_ratio=my_graph["ks_e_d"]['e'],
-    #     depth_param=my_graph["ks_e_d"]['d']
-    # ).to(device)
-
+    super_net = OFAMobileNetV3(n_classes=n_classes, width_mult=width_mult,
+        dropout_rate=0, width_mult=1.0, ks_list=[3, 5, 7], expand_ratio_list=[3, 4, 6], depth_list=[2, 3, 4],
+    )
+    super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks'], e=my_graph["ks_e_d"]['e'], d=my_graph["ks_e_d"]['d'])
+    model = super_net.get_active_subnet().to(device)
 
     model = DDP(model, device_ids=[local_rank], output_device=local_rank, find_unused_parameters=True)
 
@@ -170,15 +174,10 @@ def main():
 
         if rank == 0:
             my_result = {}
-            print(f"✅ Epoch {epoch+1}: avg loss = {total_loss / len(trainloader):.4f}")
-            my_result["loss"]=total_loss / len(trainloader)
+            print(f"\u2705 Epoch {epoch+1}: avg loss = {total_loss / len(trainloader):.4f}")
+            my_result["loss"] = total_loss / len(trainloader)
 
-    # === Save Model (only by rank 0) ===
     if rank == 0:
-        # torch.save({"state_dict": model.module.state_dict()}, f"{cifar_data_path}/ofa_teacher_12051745_{size}_cifar10.pth")
-        # print("📦 Saved teacher model")
-
-        # === Evaluation
         model.eval()
         correct = 0
         total = 0
@@ -189,7 +188,7 @@ def main():
                 _, predicted = torch.max(outputs, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-        print(f"🎯 Final Test Accuracy: {100 * correct / total:.2f}%")
+        print(f"\ud83c\udfaf Final Test Accuracy: {100 * correct / total:.2f}%")
         my_result["accuracy"] = 100 * correct / total
 
         my_graph['evaluation'].append(my_result)
@@ -197,7 +196,8 @@ def main():
         with open(input_file, 'w') as f:
             json.dump(my_graph, f, indent=2)
 
-        print(f"✅ Evaluated: {input_file}")
+        print(f"\u2705 Evaluated: {input_file}")
+
     cleanup()
 
 if __name__ == "__main__":
