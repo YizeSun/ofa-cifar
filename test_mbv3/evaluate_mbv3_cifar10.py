@@ -116,21 +116,23 @@ def main():
     testloader = DataLoader(testset, batch_size=100, shuffle=False, num_workers=4)
 
     # === Model
-    # super_net = ofa_net("ofa_mbv3_d234_e346_k357_w1.0", pretrained=False)
-    # # 'ks': [7, 5, 3, 3, 5, 5, 3, 5, 7, 7, 3, 5, 5, 7, 5, 5, 7, 3, 5, 7], 'e': [6, 4, 3, 6, 3, 3, 6, 4, 3, 4, 3, 6, 3, 6, 6, 6, 4, 6, 3, 6], 'd': [3, 2, 4, 3, 3]
-    # model = super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
-    #                     , e=my_graph["ks_e_d"]['e']
-    #                     , d=my_graph["ks_e_d"]['d'])
-    # model = model.to(device)
-    model = MobileNetV3Large(
-        n_classes=n_classes,
-        bn_param=(0.1, 1e-5),
-        dropout_rate=0,
-        width_mult=width_mult,
-        ks=my_graph["ks_e_d"]['ks'],
-        expand_ratio=my_graph["ks_e_d"]['e'],
-        depth_param=my_graph["ks_e_d"]['d']
-    ).to(device)
+    super_net = ofa_net("ofa_mbv3_d234_e346_k357_w1.0", pretrained=False)
+    super_net.load_state_dict(torch.load('./graphs/ofa_mbv3_d234_e346_k357_w1.0')['state_dict'])
+    # 'ks': [7, 5, 3, 3, 5, 5, 3, 5, 7, 7, 3, 5, 5, 7, 5, 5, 7, 3, 5, 7], 'e': [6, 4, 3, 6, 3, 3, 6, 4, 3, 4, 3, 6, 3, 6, 6, 6, 4, 6, 3, 6], 'd': [3, 2, 4, 3, 3]
+    model = super_net.set_active_subnet(ks=my_graph["ks_e_d"]['ks']
+                        , e=my_graph["ks_e_d"]['e']
+                        , d=my_graph["ks_e_d"]['d'])
+    
+    model = model.to(device)
+    # model = MobileNetV3Large(
+    #     n_classes=n_classes,
+    #     bn_param=(0.1, 1e-5),
+    #     dropout_rate=0,
+    #     width_mult=width_mult,
+    #     ks=my_graph["ks_e_d"]['ks'],
+    #     expand_ratio=my_graph["ks_e_d"]['e'],
+    #     depth_param=my_graph["ks_e_d"]['d']
+    # ).to(device)
 
 
     model = DDP(model, device_ids=[local_rank], output_device=local_rank)
