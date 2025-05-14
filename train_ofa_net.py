@@ -133,7 +133,7 @@ args.kd_type = 'ce'
 if __name__ == '__main__':
     os.makedirs(args.path, exist_ok=True)
     if args.kd_ratio > 0:
-        args.teacher_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_{224}_cifar10.pth"
+        args.teacher_path = f"/lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/ofa-cifar/datasets/ofa_teacher_12051745_{32}_cifar10.pth"
 
     num_gpus = 1
 

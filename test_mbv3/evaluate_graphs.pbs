@@ -1,0 +1,81 @@
+#!/bin/bash
+#PBS -N train_mbv3_cifar_teacher
+#PBS -l select=2:node_type=mi300a:mpiprocs=4:ncpus=96
+#PBS -l walltime=24:00:00
+#PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_30m_cifar10_32.log
+#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_30m_cifar10_32.err
+
+# Change to the direcotry that the job was submitted from
+cd $WK0/ofa-cifar/test_mbv3/
+echo $WK0
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/train_30m_cifar10_32.log
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/ttrain_30m_cifar10_32.err
+module use /opt/hlrs/testing/ai-frameworks/modulefiles
+module load pytorch
+source ~/.venv/ofa-cifar-hunter/bin/activate
+
+export DEEPSPEED_HOSTFILE=deepspeed.hostfile
+WORLD_SIZE=`cat $PBS_NODEFILE | wc -l`
+echo "World size: $WORLD_SIZE"
+
+sort $PBS_NODEFILE | awk -F'.' '{print $1}' | uniq | while read node; do
+    echo "$node slots=4"
+done > "$DEEPSPEED_HOSTFILE"
+export HEAD_NODE_IP=$(head -n 1 $PBS_NODEFILE | awk -F'.' '{print $1}')
+echo "Head node: $HEAD_NODE_IP"
+export MASTER_PORT=29500
+export MASTER_ADDR=$HEAD_NODE_IP
+
+# Generate DeepSpeed hostfile from PBS_NODEFILE
+if [ -f $PBS_NODEFILE ]; then
+  # Clear any existing hostfile
+  > $DEEPSPEED_HOSTFILE
+  # Get unique nodes, remove domain suffix, and set fixed number of slots
+  sort $PBS_NODEFILE | uniq | while read host; do
+    # Extract the node name without domain suffix
+    short_name=$(echo $host | cut -d '.' -f 1)
+    # Set fixed number of slots (4 in this case)
+    echo "$short_name slots=4" >> $DEEPSPEED_HOSTFILE
+  done
+
+  echo "Generated DeepSpeed hostfile with $(wc -l < $DEEPSPEED_HOSTFILE) nodes:"
+  cat $DEEPSPEED_HOSTFILE
+else
+  echo "Error: PBS_NODEFILE not found!"
+  exit 1
+fi
+
+###########################################################
+# Loop over each file
+GRAPH_DIR="./graphs"
+SCRIPT="evaluate_mbv3_cifar10.py"
+
+echo "Run test_final_graphs_cifar10"
+python test_final_graphs_cifar10.py
+
+# Loop over each graph file and evaluate it 3 times
+for graph_file in $GRAPH_DIR/cifar10_graph_*.json
+do
+    echo "📂 Evaluating $graph_file"
+    for i in 1 2 3
+    do
+        echo "  → Run $i"
+        mpirun -np $WORLD_SIZE \
+                --ppn 4 \
+                --genvall \
+                --cpu-bind list:0-23:24-47:48-71:72-95 \
+                --gpu-bind none \
+                --no-transfer \
+                -genv WORLD_SIZE=$WORLD_SIZE \
+                -genv LOCAL_SIZE=4 \
+                python -u /opt/hlrs/testing/ai-frameworks/DeepSpeed/deepspeed/launcher/launcher_helper.py \
+                --launcher mpich \
+                $SCRIPT --input "$graph_file"
+    done
+done
+
+# Now summarize across all evaluated files
+echo -e "\n📊 Final Summary:"
+python $SCRIPT --input $GRAPH_DIR/cifar10_graph_*.json --summary
+
+###########################################################

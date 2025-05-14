@@ -106,7 +106,7 @@ def main():
         scheduler.step()
 
         if rank == 0:
-            print(f"✅ Epoch {epoch+1}: avg loss = {total_loss / len(trainloader):.4f}")
+            print(f"✅ Epoch {epoch+1}: avg loss = {total_loss / len(trainloader):.4f}") 
 
     # === Save Model (only by rank 0) ===
     if rank == 0:
