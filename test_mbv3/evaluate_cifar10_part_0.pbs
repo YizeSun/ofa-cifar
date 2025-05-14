@@ -2,13 +2,13 @@
 #PBS -N evaluate_cifar10_part_0
 #PBS -l select=2:node_type=mi300a:mpiprocs=4:ncpus=96
 #PBS -l walltime=24:00:00
-#PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/eval_part_0.log
-#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/eval_part_0.err
+#PBS -o /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/eval_32part_0.log
+#PBS -e /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/eval_32part_0.err
 
 cd $WK0/ofa-cifar/test_mbv3/
 echo $WK0
-echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/eval_part_0.log
-echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/eval_part_0.err
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/eval_32part_0.log
+echo $(date) >> /lustre/hpe/ws12/ws12.a/ws/xmuyzsun-WK0/outputs/eval_32part_0.err
 
 module use /opt/hlrs/testing/ai-frameworks/modulefiles
 module load pytorch
