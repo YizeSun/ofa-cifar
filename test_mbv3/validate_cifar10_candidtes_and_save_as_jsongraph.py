@@ -62,14 +62,14 @@ def main():
             edges_raw = re.findall(r"tensor\((\d+)\)", edges_part)
 
             if len(nodes_raw) != NUM_NODES or len(edges_raw) != NUM_NODES * NUM_NODES:
-                print(f"❌ Graph {idx} skipped: unexpected node/edge length.")
+                print(f"Graph {idx} skipped: unexpected node/edge length.")
                 continue
 
             nodes = list(map(int, nodes_raw))
             adj = [[int(edges_raw[i * NUM_NODES + j]) for j in range(NUM_NODES)] for i in range(NUM_NODES)]
 
             if not is_valid_mbv3(adj, nodes):
-                print(f"⚠️  Graph {idx} failed validation.")
+                print(f"Graph {idx} failed validation.")
                 continue
 
             graph_data = {
@@ -84,16 +84,16 @@ def main():
             with open(out_path, "w") as fout:
                 json.dump(graph_data, fout, indent=2)
 
-            print(f"✅ Saved graph {idx} as {out_path}")
+            print(f"Saved graph {idx} as {out_path}")
 
-            if len(valid_graphs) == 30:
+            if len(valid_graphs) == 100:
                 break
 
         except Exception as e:
-            print(f"❌ Exception in graph {idx}: {e}")
+            print(f"Exception in graph {idx}: {e}")
             continue
 
-    print(f"\n🎉 Total valid graphs saved: {len(valid_graphs)}")
+    print(f"Total valid graphs saved: {len(valid_graphs)}")
 
 if __name__ == "__main__":
     main()
