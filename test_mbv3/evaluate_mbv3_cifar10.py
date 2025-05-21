@@ -52,7 +52,7 @@ def summarize_all_evaluations(file_paths):
                     all_losses.append(e['loss'])
 
     if not all_accuracies:
-        print("\u26a0\ufe0f No valid evaluations found.")
+        print("No valid evaluations found.")
         return
 
     acc_mean = np.mean(all_accuracies)
@@ -60,7 +60,7 @@ def summarize_all_evaluations(file_paths):
     loss_mean = np.mean(all_losses)
     loss_range = (np.max(all_losses) - np.min(all_losses)) / 2
 
-    print("\n\ud83d\udcca Overall Evaluation Summary:")
+    print("Overall Evaluation Summary:")
     print(f"  Accuracy = {acc_mean:.4f} ± {acc_range:.4f}")
     print(f"  Loss     = {loss_mean:.4f} ± {loss_range:.4f}")
 
@@ -174,7 +174,7 @@ def main():
 
         if rank == 0:
             my_result = {}
-            print(f"\u2705 Epoch {epoch+1}: avg loss = {total_loss / len(trainloader):.4f}")
+            print(f"Epoch {epoch+1}: avg loss = {total_loss / len(trainloader):.4f}")
             my_result["loss"] = total_loss / len(trainloader)
 
     if rank == 0:
@@ -188,7 +188,7 @@ def main():
                 _, predicted = torch.max(outputs, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-        print(f"\ud83c\udfaf Final Test Accuracy: {100 * correct / total:.2f}%")
+        print(f"Final Test Accuracy: {100 * correct / total:.2f}%")
         my_result["accuracy"] = 100 * correct / total
 
         my_graph['evaluation'].append(my_result)
@@ -196,7 +196,7 @@ def main():
         with open(input_file, 'w') as f:
             json.dump(my_graph, f, indent=2)
 
-        print(f"\u2705 Evaluated: {input_file}")
+        print(f"Evaluated: {input_file}")
 
     cleanup()
 
