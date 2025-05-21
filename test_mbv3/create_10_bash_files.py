@@ -43,11 +43,12 @@ SCRIPT="evaluate_mbv3_cifar10.py"
 {loop_block}
 
 # Final Summary
-# echo -e "\\n📊 Final Summary:"
+# echo -e "\n Final Summary:"
 # python $SCRIPT --input {input_summary}
 """
 
-for part_id in range(10):
+# for part_id in range(10):
+for part_id in range(90, 100):
     start = part_id * 3
     end = start + 3
     files = [f"$GRAPH_DIR/cifar10_graph_{i:03d}.json" for i in range(start, end)]
